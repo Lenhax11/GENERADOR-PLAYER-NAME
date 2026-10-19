@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador playernameOverwrite.json - OBS FF</title>
+<meta name="theme-color" content="#050505">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OBS FF">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050505;
+    --card: #0c0c0f;
+    --line: rgba(255,255,255,.12);
+    --lime: #d4ff00;
+    --purple: #7b2cff;
+    --pink: #ff4fa3;
+    --orange: #ff6a13;
+    --text: #f4f4f4;
+    --muted: #9a9aa6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---------- NAV ---------- */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 40px; position: relative; z-index: 5;
+  }
+  .logo { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: 1px; }
+  .logo sup { font-size: 9px; font-family: 'Inter'; }
+  .nav ul { display: flex; gap: 38px; list-style: none; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
+  .nav ul a { color: var(--text); text-decoration: none; opacity: .85; }
+  .nav ul a:hover { color: var(--lime); }
+  .nav-cta { display: flex; gap: 14px; align-items: center; }
+
+  /* ---------- BUTTONS ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 18px;
+    background: var(--lime); color: #000; border: none; cursor: pointer;
+    font-family: 'Inter'; font-weight: 700; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    padding: 15px 20px; border-radius: 5px; text-decoration: none; transition: .2s;
+  }
+  .btn::after { content: "↗"; font-size: 14px; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(212,255,0,.35); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  .btn.ghost::after { content: "+"; }
+  .btn.ghost:hover { border-color: var(--lime); color: var(--lime); box-shadow: none; }
+  .btn.full { width: 100%; }
+  .btn.small { padding: 11px 14px; font-size: 10px; }
+  .circle {
+    width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line);
+    display: grid; place-items: center; font-size: 15px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero { position: relative; padding: 30px 40px 70px; min-height: 520px; overflow: hidden; }
+  .hero .eyebrow { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .hero .eyebrow b { color: var(--text); font-weight: 500; }
+  .torus {
+    position: absolute; right: 4%; top: -40px; width: 520px; height: 520px; border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, #050505 0 22%, transparent 23%),
+      conic-gradient(from 200deg, #ff7a18, #ff2d95, #7b2cff, #3a0ca3, #ff7a18);
+    filter: blur(1px) saturate(1.2);
+    -webkit-mask: radial-gradient(circle, transparent 0 20%, #000 21% 62%, transparent 70%);
+            mask: radial-gradient(circle, transparent 0 20%, #000 21% 62%, transparent 70%);
+    opacity: .9; animation: spin 18s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .headline { font-family: 'Anton', sans-serif; font-style: italic; text-transform: uppercase; line-height: .88; margin-top: 26px; position: relative; z-index: 2; }
+  .headline .l1 { display: block; font-size: clamp(70px, 12vw, 150px); color: #f2f2f2; transform: skewX(-8deg); }
+  .headline .l2 { display: block; font-size: clamp(70px, 12vw, 150px); color: var(--lime); transform: skewX(-8deg) translateX(110px); }
+  .hero p.lead { position: relative; z-index: 2; margin-top: 18px; max-width: 250px; font-size: 12px; line-height: 1.5; color: #e5e5e5; }
+  .hero-actions { position: relative; z-index: 2; display: flex; align-items: center; gap: 30px; margin-top: 40px; }
+  .hero-actions .btn { min-width: 160px; }
+  .watch { font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; display: flex; align-items: center; gap: 14px; }
+  .watch i { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 10px; }
+  .ticket {
+    position: absolute; right: 40px; bottom: 80px; z-index: 3;
+    background: var(--lime); color: #000; padding: 18px 20px; width: 170px; border-radius: 10px;
+    transform: rotate(-6deg); font-family: 'Anton'; font-size: 20px; line-height: 1.15; text-transform: uppercase;
+  }
+  .ticket small { display: block; font-family: 'Inter'; font-weight: 600; font-size: 9px; letter-spacing: .5px; margin-top: 12px; line-height: 1.4; }
+  .ticket::before { content: "↗"; position: absolute; top: -12px; right: 8px; background: #000; color: var(--lime); width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; font-family: 'Inter'; font-size: 13px; }
+  .seal {
+    position: absolute; left: 45%; top: 190px; width: 84px; height: 84px; border-radius: 50%; z-index: 3;
+    border: 1px dashed rgba(255,255,255,.5); display: grid; place-items: center; font-size: 36px; background: #0a0a0a;
+  }
+
+  /* ---------- PANELS ---------- */
+  main { padding: 0 14px 20px; display: grid; gap: 14px; }
+  .panel {
+    border-radius: 14px; border: 1px solid var(--line); background: var(--card); padding: 30px 32px; position: relative; overflow: hidden;
+  }
+  .panel.purple {
+    background: linear-gradient(120deg, #3a0ca3 0%, #7b2cff 45%, #ff4fa3 100%);
+    border: none;
+  }
+  .panel.purple::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 80% 0%, rgba(255,255,255,.18), transparent 50%);
+    pointer-events: none;
+  }
+  .panel > * { position: relative; }
+  .tag { font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; font-weight: 500; display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .tag::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .panel.purple .tag::after { background: rgba(255,255,255,.3); }
+  h2 { font-family: 'Anton'; font-weight: 400; font-style: italic; text-transform: uppercase; font-size: 34px; letter-spacing: .5px; line-height: 1; margin-bottom: 8px; }
+  h2 em { color: var(--lime); font-style: italic; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 22px; max-width: 520px; line-height: 1.5; }
+
+  /* ---------- FORM ---------- */
+  label { display: block; margin-bottom: 7px; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  input, select, textarea {
+    width: 100%; padding: 12px 14px; background: #08080a; border: 1px solid var(--line); color: #fff;
+    border-radius: 6px; font-family: 'Inter'; font-size: 13px; outline: none; transition: .2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--lime); box-shadow: 0 0 0 3px rgba(212,255,0,.12); }
+  select option { background: #0c0c0f; }
+
+  .team-card {
+    background: #0a0a0d; border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin-bottom: 16px;
+    position: relative; border-top: 3px solid var(--lime);
+  }
+  .team-card:nth-child(3n+2) { border-top-color: var(--purple); }
+  .team-card:nth-child(3n+3) { border-top-color: var(--orange); }
+  .team-header { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .players-title { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--lime); margin-bottom: 10px; font-weight: 600; }
+  .player-row {
+    display: grid; grid-template-columns: 1fr 2fr 1.2fr; gap: 10px; margin-bottom: 8px;
+    padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.02);
+  }
+  .player-row input, .player-row select { padding: 10px 12px; }
+  .btn-player { margin-top: 8px; }
+
+  .stickers { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .sticker { font-family: 'Anton'; text-transform: uppercase; font-size: 15px; padding: 10px 16px; border-radius: 8px; color: #000; transform: rotate(-4deg); }
+  .sticker:nth-child(1) { background: var(--orange); }
+  .sticker:nth-child(2) { background: var(--lime); transform: rotate(3deg); }
+  .sticker:nth-child(3) { background: #8a3cff; color: #fff; transform: rotate(-2deg); }
+
+  .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+  textarea { height: 280px; font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--lime); resize: vertical; line-height: 1.5; }
+
+  footer { display: flex; justify-content: space-between; padding: 24px 40px 34px; font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); border-top: 1px solid var(--line); margin-top: 6px; }
+  footer b { font-family: 'Anton'; font-size: 18px; color: #fff; letter-spacing: 1px; }
+
+  /* ---------- LOCK SCREEN ---------- */
+  #lockScreen {
+    position: fixed; inset: 0; z-index: 999; display: grid; place-items: center; padding: 20px;
+    background:
+      radial-gradient(circle at 80% 10%, rgba(123,44,255,.55), transparent 55%),
+      radial-gradient(circle at 15% 90%, rgba(255,79,163,.35), transparent 50%),
+      #050505;
+  }
+  .lock-box {
+    width: 100%; max-width: 380px; background: rgba(12,12,15,.92); border: 1px solid var(--line);
+    border-top: 3px solid var(--lime); border-radius: 14px; padding: 32px 28px;
+  }
+  .lock-box .logo { margin-bottom: 18px; }
+  #pwdError { display: none; color: #ff5c5c; font-size: 12px; margin-top: 10px; }
+
+  @media (max-width: 860px) {
+    .nav ul { display: none; }
+    .nav, .hero { padding-left: 20px; padding-right: 20px; }
+    .torus { width: 340px; height: 340px; right: -60px; opacity: .6; }
+    .headline .l2 { transform: skewX(-8deg) translateX(40px); }
+    .ticket { position: relative; right: auto; bottom: auto; margin-top: 30px; }
+    .seal { display: none; }
+    .grid-2, .team-header, .player-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PANTALLA DE CONTRASEÑA -->
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="logo">OBS<sup>®</sup> FF</div>
+    <h2>Acceso <em>privado</em></h2>
+    <p class="sub">Ingresa la contraseña para usar el generador.</p>
+    <form onsubmit="return checkPassword(event)">
+      <label for="pwd">Contraseña</label>
+      <input type="password" id="pwd" placeholder="••••••••" autocomplete="current-password" autofocus>
+      <div id="pwdError">Contraseña incorrecta</div>
+      <button type="submit" class="btn full" style="margin-top:14px;">Entrar</button>
+    </form>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+
+<!-- NAV -->
+<header class="nav">
+  <div class="logo">OBS<sup>®</sup> FF</div>
+  <ul>
+    <li><a href="#equipos">Equipos</a></li>
+    <li><a href="#resultado">Resultado</a></li>
+    <li><a href="#info">Info</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a class="btn" href="#equipos">Empezar</a>
+    <div class="circle">≡</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">Herramienta • <b>OBS Free Fire</b></div>
+  <div class="torus"></div>
+  <div class="seal">🌐</div>
+  <h1 class="headline">
+    <span class="l1">Genera el</span>
+    <span class="l2">JSON</span>
+  </h1>
+  <p class="lead">PlayerNameList y TeamRegionList. Equipos, jugadores y roles en un solo archivo listo para OBS.</p>
+  <div class="hero-actions">
+    <a class="btn" href="#equipos">Crear equipos</a>
+    <a class="watch" href="#resultado"><span>Ver resultado</span><i>▶</i></a>
+  </div>
+  <div class="ticket">PlayerName<br>Overwrite.json<small>OBS FF<br>Estructura exacta</small></div>
+</section>
+
+<main>
+  <!-- EQUIPOS -->
+  <section class="panel purple" id="equipos">
+    <div class="tag">Equipos A–Z <span>↗</span></div>
+    <h2>Arma tu <em>lineup</em></h2>
+    <p class="sub">Añade cada equipo con su prefijo, región y jugadores (UID, nick y rol).</p>
+
+    <div id="teamsContainer">
+      <!-- Equipo de Ejemplo -->
+      <div class="team-card">
+        <div class="team-header">
+          <div>
+            <label>Prefijo del Equipo / Tag (Ej. M7, RVK)</label>
+            <input type="text" placeholder="Ej. M7" class="team-prefix" value="M7">
+          </div>
+          <div>
+            <label>Región / País</label>
+            <select class="team-region" onchange="toggleCustomRegion(this)">
+            <option value="Brazil">Brazil</option>
+            <option value="Argentina">Argentina</option>
+            <option value="Chile">Chile</option>
+            <option value="Peru">Peru</option>
+            <option value="Mexico">Mexico</option>
+            <option value="Colombia">Colombia</option>
+            <option value="Spain">Spain</option>
+            <option value="United-States">United-States</option>
+            <option value="__otro__">Otro (escribir texto)...</option>
+          </select>
+          <input type="text" class="team-region-custom" placeholder="Escribe la región / texto" style="display:none; margin-top:8px;">
+          </div>
+        </div>
+
+        <div class="players-title">Jugadores de este equipo</div>
+        <div class="players-list">
+          <div class="player-row">
+            <input type="number" placeholder="PlayerID (UID)" class="player-id" value="13039709768">
+            <input type="text" placeholder="Nick (Ej. M7  saixxt)" class="player-name" value="M7  saixxt">
+            <select class="player-role">
+              <option value="RUSHER">RUSHER</option>
+              <option value="SUPPORT">SUPPORT</option>
+              <option value="SNIPER">SNIPER</option>
+              <option value="BOMBER">BOMBER</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn ghost small btn-player" onclick="addPlayerToTeam(this)">Añadir jugador a este equipo</button>
+      </div>
+    </div>
+
+    <button type="button" class="btn full" onclick="addTeamCard()">Añadir nuevo equipo</button>
+  </section>
+
+  <!-- INFO -->
+  <section class="panel" id="info">
+    <div class="tag">La experiencia <span>↗</span></div>
+    <h2>Todo lo que <em>necesitas</em></h2>
+    <p class="sub">Cada equipo recibe un TeamID incremental. Cada jugador se guarda con su UID, nick y rol.</p>
+    <div class="stickers">
+      <span class="sticker">Equipos ilimitados</span>
+      <span class="sticker">4 roles</span>
+      <span class="sticker">JSON listo</span>
+    </div>
+  </section>
+
+  <!-- RESULTADO -->
+  <section class="panel" id="resultado">
+    <div class="grid-2">
+      <div>
+        <div class="tag">Código resultante <span>↗</span></div>
+        <textarea id="jsonOutput" readonly placeholder="El formato JSON aparecerá aquí..."></textarea>
+      </div>
+      <div style="display:flex; flex-direction:column; justify-content:flex-end; gap:14px;">
+        <h2>No te pierdas <em>ni un tag</em></h2>
+        <p class="sub" style="margin-bottom:6px;">Genera el archivo y se descargará automáticamente como PlayerNameOverwrite.json.</p>
+        <button type="button" class="btn full" onclick="generateJSON()">Generar y descargar JSON</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <b>OBS FF</b>
+  <span>© Generador PlayerNameOverwrite · Todos los derechos reservados</span>
+  <span>Privacy Policy · Terms &amp; Conditions</span>
+</footer>
+
+</div><!-- /#app -->
+
+<script>
+  // ====== APP INSTALABLE (PWA) ======
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+
+  // ====== CONTRASEÑA ======
+  // Para cambiarla: genera el SHA-256 de tu nueva clave y pégalo aquí.
+  // (Ej. en https://emn178.github.io/online-tools/sha256.html)
+  const PASSWORD_HASH = "58ade89a8489b1339b70c3ff672e27cdd9976d9b2dad076148fb737368178b06"; // clave actual: OBSFF2026
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function unlock() {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+
+  async function checkPassword(e) {
+    e.preventDefault();
+    const value = document.getElementById('pwd').value;
+    const err = document.getElementById('pwdError');
+    try {
+      if (await sha256(value) === PASSWORD_HASH) {
+        try { sessionStorage.setItem('obsff_auth', PASSWORD_HASH); } catch (_) {}
+        err.style.display = 'none';
+        unlock();
+      } else {
+        err.style.display = 'block';
+        document.getElementById('pwd').value = '';
+      }
+    } catch (_) {
+      err.textContent = 'Abre la página con https o desde un navegador actualizado.';
+      err.style.display = 'block';
+    }
+    return false;
+  }
+
+  try {
+    if (sessionStorage.getItem('obsff_auth') === PASSWORD_HASH) unlock();
+  } catch (_) {}
+
+  // ====== GENERADOR ======
+  function playerRowHTML() {
+    return `
+      <input type="number" placeholder="PlayerID (UID)" class="player-id">
+      <input type="text" placeholder="Nick a mostrar" class="player-name">
+      <select class="player-role">
+        <option value="RUSHER">RUSHER</option>
+        <option value="SUPPORT">SUPPORT</option>
+        <option value="SNIPER">SNIPER</option>
+        <option value="BOMBER">BOMBER</option>
+      </select>`;
+  }
+
+  function toggleCustomRegion(select) {
+    const custom = select.parentElement.querySelector('.team-region-custom');
+    const isOther = select.value === '__otro__';
+    custom.style.display = isOther ? 'block' : 'none';
+    if (isOther) custom.focus();
+  }
+
+  function addPlayerToTeam(btn) {
+    const playersList = btn.previousElementSibling;
+    const div = document.createElement('div');
+    div.className = 'player-row';
+    div.innerHTML = playerRowHTML();
+    playersList.appendChild(div);
+  }
+
+  function addTeamCard() {
+    const container = document.getElementById('teamsContainer');
+    const div = document.createElement('div');
+    div.className = 'team-card';
+    div.innerHTML = `
+      <div class="team-header">
+        <div>
+          <label>Prefijo del Equipo / Tag</label>
+          <input type="text" placeholder="Ej. RVK" class="team-prefix">
+        </div>
+        <div>
+          <label>Región / País</label>
+          <select class="team-region" onchange="toggleCustomRegion(this)">
+            <option value="Brazil">Brazil</option>
+            <option value="Argentina">Argentina</option>
+            <option value="Chile">Chile</option>
+            <option value="Peru">Peru</option>
+            <option value="Mexico">Mexico</option>
+            <option value="Colombia">Colombia</option>
+            <option value="Spain">Spain</option>
+            <option value="United-States">United-States</option>
+            <option value="__otro__">Otro (escribir texto)...</option>
+          </select>
+          <input type="text" class="team-region-custom" placeholder="Escribe la región / texto" style="display:none; margin-top:8px;">
+        </div>
+      </div>
+      <div class="players-title">Jugadores de este equipo</div>
+      <div class="players-list">
+        <div class="player-row">${playerRowHTML()}</div>
+      </div>
+      <button type="button" class="btn ghost small btn-player" onclick="addPlayerToTeam(this)">Añadir jugador a este equipo</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function generateJSON() {
+    const teamCards = document.querySelectorAll('.team-card');
+    const playerListArray = [];
+    const teamRegionArray = [];
+    let teamIdCounter = 1;
+
+    teamCards.forEach(card => {
+      const regionSelect = card.querySelector('.team-region').value;
+      const region = regionSelect === '__otro__'
+        ? card.querySelector('.team-region-custom').value.trim()
+        : regionSelect;
+      const playerRows = card.querySelectorAll('.player-row');
+
+      teamRegionArray.push({
+        "TeamID": teamIdCounter,
+        "TeamRegion": region,
+        "Color": "#FFFFFF"
+      });
+
+      playerRows.forEach(row => {
+        const id = row.querySelector('.player-id').value.trim();
+        const name = row.querySelector('.player-name').value.trim();
+        const role = row.querySelector('.player-role').value;
+
+        if (id && name) {
+          playerListArray.push({
+            "PlayerID": parseInt(id),
+            "PlayerNameOverwrite": name,
+            "PlayerNation": role,
+            "Color": "#FFFFFF"
+          });
+        }
+      });
+
+      teamIdCounter++;
+    });
+
+    const finalObject = {
+      "PlayerNameList": playerListArray,
+      "TeamRegionList": teamRegionArray
+    };
+
+    const jsonString = JSON.stringify(finalObject, null, 2);
+    document.getElementById('jsonOutput').value = jsonString;
+
+    saveJSONFile(jsonString);
+  }
+
+  async function saveJSONFile(jsonString) {
+    const fileName = "PlayerNameOverwrite.json";
+    // App Android (Capacitor): guarda el archivo y abre el menú de compartir/guardar
+    const cap = window.Capacitor;
+    if (cap && cap.isNativePlatform && cap.isNativePlatform() && cap.Plugins && cap.Plugins.Filesystem && cap.Plugins.Share) {
+      try {
+        const res = await cap.Plugins.Filesystem.writeFile({
+          path: fileName, data: jsonString, directory: 'CACHE', encoding: 'utf8'
+        });
+        await cap.Plugins.Share.share({
+          title: fileName, text: 'PlayerNameOverwrite.json', url: res.uri, dialogTitle: 'Guardar o enviar JSON'
+        });
+        return;
+      } catch (err) {
+        if (err && /cancel/i.test(String(err.message || err))) return;
+        alert('No se pudo guardar el archivo: ' + (err.message || err));
+        return;
+      }
+    }
+    // Navegador / Windows (Electron)
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+  }
+</script>
+</body>
+</html>
